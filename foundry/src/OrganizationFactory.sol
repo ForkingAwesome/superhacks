@@ -13,16 +13,13 @@ contract OrganizationFactory is Ownable {
         i_organizationRegistry = new OrganizationRegistry(address(this));
     }
 
-    function createOrganization(address _organizationAdmin) public {
+    function createOrganization() public {
         require(
             !i_organizationRegistry.isOrganizationOwner(msg.sender),
             "Address already an Owner"
         );
 
-        Organization organization = new Organization(
-            msg.sender,
-            _organizationAdmin
-        );
+        Organization organization = new Organization(msg.sender);
         i_organizationRegistry.addOrganization(organization);
     }
 

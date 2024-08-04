@@ -35,8 +35,8 @@ contract OrganizationRegistry {
         address organizationAddress = address(_organization);
         address organizationOwner = _organization.getOwner();
 
-        s_organizationStatus[organizationAddress] = true;
-        s_isOrganizationOwner[organizationOwner] = true;
+        s_organizationStatus[organizationAddress] = false;
+        s_isOrganizationOwner[organizationOwner] = false;
     }
 
     function getDeployedOrganizationsAddresses()
@@ -45,6 +45,10 @@ contract OrganizationRegistry {
         returns (address[] memory)
     {
         return s_deployedOrganizations;
+    }
+
+    function getOrganizationOwners() public view returns (address[] memory) {
+        return s_organizationOwners;
     }
 
     function isOrganizationActive(

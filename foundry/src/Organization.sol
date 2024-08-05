@@ -36,7 +36,8 @@ contract Organization is Ownable {
             _name,
             _description,
             _adminAddress,
-            owner()
+            owner(),
+            _adminAddress
         );
         address projectAddress = address(project);
 

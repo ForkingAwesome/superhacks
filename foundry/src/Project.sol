@@ -13,15 +13,24 @@ contract Project is SubDAO {
         string memory _name,
         string memory _description,
         address _admin,
-        address _ownerAddress
-    ) SubDAO(_name, _description, _admin, _ownerAddress) {}
+        address _ownerAddress,
+        address _additionalAdminAddress
+    )
+        SubDAO(
+            _name,
+            _description,
+            _admin,
+            _ownerAddress,
+            _additionalAdminAddress
+        )
+    {}
 
     function createTeam(
         string memory _name,
         string memory _description,
         address _admin
     ) public onlyAuthorized {
-        Team team = new Team(_name, _description, _admin, owner());
+        Team team = new Team(_name, _description, _admin, owner(), getAdmin());
         address teamAddress = address(team);
 
         s_teams.push(teamAddress);

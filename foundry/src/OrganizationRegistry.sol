@@ -5,10 +5,10 @@ pragma solidity ^0.8.20;
 import {Organization} from "./Organization.sol";
 
 contract OrganizationRegistry {
-    address[] public s_deployedOrganizations;
-    address[] public s_organizationOwners;
+    address[] private s_deployedOrganizations;
+    address[] private s_organizationOwners;
 
-    address public immutable i_authorizedFactory;
+    address private immutable i_authorizedFactory;
 
     mapping(address => bool) private s_organizationStatus;
     mapping(address => bool) private s_isOrganizationOwner;
@@ -21,7 +21,7 @@ contract OrganizationRegistry {
         Organization _organization
     ) public onlyAuthorizedFactory {
         address organizationAddress = address(_organization);
-        address organizationOwner = _organization.getOwner();
+        address organizationOwner = _organization.owner();
 
         s_deployedOrganizations.push(organizationAddress);
         s_organizationOwners.push(organizationOwner);
@@ -33,7 +33,7 @@ contract OrganizationRegistry {
         Organization _organization
     ) public onlyAuthorizedFactory {
         address organizationAddress = address(_organization);
-        address organizationOwner = _organization.getOwner();
+        address organizationOwner = _organization.owner();
 
         s_organizationStatus[organizationAddress] = false;
         s_isOrganizationOwner[organizationOwner] = false;

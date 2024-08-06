@@ -1,3 +1,4 @@
+- [ ] Code Rewrite FULL
 - [ ] Add Proposals
 - [ ] Add Events
 - [ ] Add Errors
@@ -6,8 +7,17 @@
 - [ ] Create Treasury Contract for each Organization
 - [ ] Time Lock
 - [ ] Add Roles (eg CEO, CTO, etc...)
-- [ ] Chainlink
+- [ ] Chainlink (change contract for token based voting - for CCIP)
 - [ ] WorldID
 - [ ] EAS
-- [ ] Identity Management on Metal L2
+- [ ] Identity Management and Reputation Score based on Timelock and number of votes on Metal L2
 - [ ] Create a Rollup on Conduit
+- [ ] Landing Page
+- [ ] Main Dashboard Page (Project Listing + 'Add Project' button + Search Filter)
+- [ ] Form for Add Project - (Name, Description, Category)
+- [ ] Project Dashboard Page (w/ Create Team button)
+- [ ] Form for Create Team - (Name, Description, Address[])
+- [ ] Individual Team Dashboard Page
+- [ ] Forums Page
+- [ ] Individual Proposal Page
+- [ ] Integrate Blockscout API

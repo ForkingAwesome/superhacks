@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.20;
 
-import {SubDAO} from "./interfaces/ISubDAO.sol";
+import {SubDAO} from "../interfaces/ISubDAO.sol";
 
 contract Team is SubDAO {
     address[] private s_members;

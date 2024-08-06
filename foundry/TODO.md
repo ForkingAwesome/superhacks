@@ -1,0 +1,13 @@
+- [ ] Add Proposals
+- [ ] Add Events
+- [ ] Add Errors
+- [ ] Add Images for Organization
+- [ ] Add Comments
+- [ ] Create Treasury Contract for each Organization
+- [ ] Time Lock
+- [ ] Add Roles (eg CEO, CTO, etc...)
+- [ ] Chainlink
+- [ ] WorldID
+- [ ] EAS
+- [ ] Identity Management on Metal L2
+- [ ] Create a Rollup on Conduit

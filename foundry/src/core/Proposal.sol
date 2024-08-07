@@ -2,51 +2,52 @@
 
 pragma solidity ^0.8.20;
 
-import {Bytes32Utils} from "../utils/Bytes32Utils.sol";
+import {IWorldID} from "../worldcoin/interfaces/IWorldID.sol";
+import {WorldIDVerifier} from "../worldcoin/WorldIDVerifier.sol";
 
-enum ProposalStatus {
-    OPEN,
-    CLOSED
-}
+contract Proposal is WorldIDVerifier {
+    enum ProposalStatus {
+        OPEN,
+        CLOSED
+    }
 
-enum ProposalLevel {
-    TOP,
-    MID,
-    BOTTOM
-}
+    enum ProposalResult {
+        ACCEPTED,
+        REJECTED
+    }
 
-enum ProposalResult {
-    ACCEPTED,
-    NO_RESULT,
-    REJECTED
-}
+    string private s_proposalTitle;
+    string private s_proposalDescription;
+    uint256 private s_proposalVotesInFavor = 0;
+    uint256 private s_proposalVotesAgainst = 0;
 
-contract Proposal {
-    using Bytes32Utils for bytes32;
-    using Bytes32Utils for string;
-
-    bytes32 private immutable s_proposalTitle;
-    bytes32 private immutable s_proposalDescription;
-    ProposalLevel private immutable s_proposalLevel;
-    ProposalStatus private s_proposalStatus = ProposalStatus.OPEN;
+    ProposalStatus private s_proposalStatus;
     ProposalResult private s_proposalResult;
-    int256 private s_proposalVotes;
 
     constructor(
         string memory _proposalTitle,
         string memory _proposalDescription,
-        ProposalLevel _proposalLevel
-    ) {
-        s_proposalTitle = _proposalTitle.stringToBytes32();
-        s_proposalDescription = _proposalDescription.stringToBytes32();
-        s_proposalLevel = _proposalLevel;
+        IWorldID _worldId,
+        string memory _appId,
+        string memory _actionId
+    ) WorldIDVerifier(_worldId, _appId, _actionId) {
+        s_proposalTitle = _proposalTitle;
+        s_proposalDescription = _proposalDescription;
+        s_proposalStatus = ProposalStatus.OPEN;
     }
 
-    function voteOnProposal(bool _inFavor) public proposalNotClosed {
+    function voteOnProposal(
+        bool _inFavor,
+        address signal,
+        uint256 root,
+        uint256 nullifierHash,
+        uint256[8] calldata proof
+    ) public proposalNotClosed {
+        verifyAndExecute(signal, root, nullifierHash, proof);
         if (_inFavor == true) {
-            s_proposalVotes += 1;
+            s_proposalVotesInFavor += 1;
         } else {
-            s_proposalVotes -= 1;
+            s_proposalVotesAgainst += 1;
         }
     }
 
@@ -54,31 +55,27 @@ contract Proposal {
         s_proposalStatus = ProposalStatus.CLOSED;
     }
 
-    function calculateResult() internal {
-        if (s_proposalVotes > 0) {
+    function calculateResult(uint256 _totalMembers) internal {
+        if (s_proposalVotesInFavor >= (_totalMembers / 2)) {
             s_proposalResult = ProposalResult.ACCEPTED;
-        } else if (s_proposalVotes == 0) {
-            s_proposalResult = ProposalResult.NO_RESULT;
         } else {
             s_proposalResult = ProposalResult.REJECTED;
         }
     }
 
-    function calculateVotesAndCloseProposal() public proposalNotClosed {
-        calculateResult();
+    function calculateVotesAndCloseProposal(
+        uint256 _totalMembers
+    ) public proposalNotClosed {
+        calculateResult(_totalMembers);
         closeProposal();
     }
 
     function getProposalTitle() public view returns (string memory) {
-        return s_proposalTitle.bytes32ToString();
+        return s_proposalTitle;
     }
 
     function getProposalDescription() public view returns (string memory) {
-        return s_proposalDescription.bytes32ToString();
-    }
-
-    function getProposalLevel() public view returns (ProposalLevel) {
-        return s_proposalLevel;
+        return s_proposalDescription;
     }
 
     function getProposalStatus() public view returns (ProposalStatus) {
@@ -87,7 +84,7 @@ contract Proposal {
 
     modifier proposalNotClosed() {
         require(
-            s_proposalStatus == ProposalStatus.OPEN,
+            getProposalStatus() == ProposalStatus.OPEN,
             "This Proposal is Closed"
         );
         _;

@@ -7,6 +7,9 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Proposal} from "./Proposal.sol";
 
 contract MainDAO is Ownable {
+    error NotEnoughVotesToCloseProposal();
+    error NotProposalOwner();
+
     address[] public s_subDaos;
     address[] public s_proposals;
     uint256 private s_totalMembers = 0;
@@ -16,6 +19,7 @@ contract MainDAO is Ownable {
     IWorldID internal immutable worldId;
 
     event NewProposalCreated(string indexed title, string indexed description);
+    event ProposalClosed(address proposalAddress);
 
     constructor(IWorldID _worldID) Ownable(msg.sender) {
         worldId = _worldID;
@@ -28,6 +32,7 @@ contract MainDAO is Ownable {
         string memory _actionId
     ) public {
         Proposal newProposal = new Proposal(
+            msg.sender,
             _title,
             _description,
             worldId,
@@ -49,5 +54,25 @@ contract MainDAO is Ownable {
     ) public {
         Proposal proposal = Proposal(_proposalAddress);
         proposal.voteOnProposal(_inFavor, signal, root, nullifierHash, proof);
+    }
+
+    function closeProposal(address _proposalAddress) public {
+        Proposal proposal = Proposal(_proposalAddress);
+        address owner = proposal.getProposalCreator();
+
+        if (msg.sender != owner) {
+            revert NotProposalOwner();
+        }
+
+        uint256 totalVotes = proposal.getProposalVotesInFavor() +
+            proposal.getProposalVotesAgainst();
+
+        if (totalVotes < ((80 * s_totalMembers) / 100)) {
+            revert NotEnoughVotesToCloseProposal();
+        }
+
+        proposal.calculateVotesAndCloseProposal(s_totalMembers);
+
+        emit ProposalClosed(_proposalAddress);
     }
 }

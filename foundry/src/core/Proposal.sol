@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 
 import {IWorldID} from "../worldcoin/interfaces/IWorldID.sol";
 import {WorldIDVerifier} from "../worldcoin/WorldIDVerifier.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Proposal is WorldIDVerifier {
     enum ProposalStatus {
@@ -20,11 +21,13 @@ contract Proposal is WorldIDVerifier {
     string private s_proposalDescription;
     uint256 private s_proposalVotesInFavor = 0;
     uint256 private s_proposalVotesAgainst = 0;
+    address private immutable s_proposalCreator;
 
     ProposalStatus private s_proposalStatus;
     ProposalResult private s_proposalResult;
 
     constructor(
+        address _proposalCreator,
         string memory _proposalTitle,
         string memory _proposalDescription,
         IWorldID _worldId,
@@ -34,6 +37,7 @@ contract Proposal is WorldIDVerifier {
         s_proposalTitle = _proposalTitle;
         s_proposalDescription = _proposalDescription;
         s_proposalStatus = ProposalStatus.OPEN;
+        s_proposalCreator = _proposalCreator;
     }
 
     function voteOnProposal(
@@ -68,6 +72,18 @@ contract Proposal is WorldIDVerifier {
     ) public proposalNotClosed {
         calculateResult(_totalMembers);
         closeProposal();
+    }
+
+    function getProposalVotesInFavor() public view returns (uint256) {
+        return s_proposalVotesInFavor;
+    }
+
+    function getProposalVotesAgainst() public view returns (uint256) {
+        return s_proposalVotesAgainst;
+    }
+
+    function getProposalCreator() public view returns (address) {
+        return s_proposalCreator;
     }
 
     function getProposalTitle() public view returns (string memory) {

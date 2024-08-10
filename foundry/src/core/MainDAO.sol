@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 
 import {IWorldID} from "../worldcoin/interfaces/IWorldID.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {Proposal} from "./Proposal.sol";
+import {Proposal, ProposalStatus} from "./Proposal.sol";
 
 contract MainDAO is Ownable {
     error NotEnoughVotesToCloseProposal();
@@ -53,11 +53,23 @@ contract MainDAO is Ownable {
         uint256[8] calldata proof
     ) public {
         Proposal proposal = Proposal(_proposalAddress);
+
+        require(
+            proposal.getProposalStatus() == ProposalStatus.OPEN,
+            "Cannot vote on a closed proposal!"
+        );
+
         proposal.voteOnProposal(_inFavor, signal, root, nullifierHash, proof);
     }
 
     function closeProposal(address _proposalAddress) public {
         Proposal proposal = Proposal(_proposalAddress);
+
+        require(
+            proposal.getProposalStatus() == ProposalStatus.OPEN,
+            "The Proposal is already Closed"
+        );
+
         address owner = proposal.getProposalCreator();
 
         if (msg.sender != owner) {

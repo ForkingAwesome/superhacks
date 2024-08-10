@@ -6,12 +6,12 @@ import {IWorldID} from "../worldcoin/interfaces/IWorldID.sol";
 import {WorldIDVerifier} from "../worldcoin/WorldIDVerifier.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Proposal is WorldIDVerifier {
-    enum ProposalStatus {
-        OPEN,
-        CLOSED
-    }
+enum ProposalStatus {
+    OPEN,
+    CLOSED
+}
 
+contract Proposal is WorldIDVerifier {
     enum ProposalResult {
         ACCEPTED,
         REJECTED
